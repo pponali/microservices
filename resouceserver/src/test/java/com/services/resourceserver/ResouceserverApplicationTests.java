@@ -1,4 +1,4 @@
-package com.services.resouceserver;
+package com.services.resourceserver;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
