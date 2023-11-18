@@ -38,13 +38,13 @@ public class SecurityUser {
             @JoinColumn(name = "USERS_ID", referencedColumnName = "ID")}, inverseJoinColumns = {
             @JoinColumn(name = "AUTHORITIES_ID", referencedColumnName = "ID")
     })
-    @ManyToMany(cascade = CascadeType.MERGE, fetch = FetchType.EAGER)
+    @ManyToMany(cascade = {CascadeType.MERGE, CascadeType.PERSIST, CascadeType.REFRESH} , fetch = FetchType.EAGER)
     private Set<Authority> authorities;
 
-    private Boolean accountNonExpired;
-    private Boolean accountNonLocked;
-    private Boolean enabled;
-    private Boolean credentialsNonExpired;
+    private Boolean accountNonExpired = Boolean.FALSE;
+    private Boolean accountNonLocked = Boolean.FALSE;
+    private Boolean enabled = Boolean.TRUE;
+    private Boolean credentialsNonExpired  = Boolean.FALSE;
 
 
 

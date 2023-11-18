@@ -85,44 +85,8 @@ public class AuthorizationServerConfig {
             clientRepository.save(registeredClient);
         }
 
-        if(!detailsManager.userExists("user")){
-            UserDetails user = User.withDefaultPasswordEncoder()
-                    .username("user")
-                    .password("password")
-                    .roles("USER", "ADMIN")
-                    .accountExpired(false)
-                    .accountLocked(false)
-                    .credentialsExpired(false)
-                    .authorities("USER")
-                    .build();
-            detailsManager.createUser(user);
-        }
 
-        if(!detailsManager.userExists("admin")){
-            UserDetails user = User.withDefaultPasswordEncoder()
-                    .username("admin")
-                    .password("password")
-                    .accountExpired(false)
-                    .accountLocked(false)
-                    .credentialsExpired(false)
-                    .authorities( "ADMIN")
-                    .build();
-            detailsManager.createUser(user);
-        }
-
-        if(!detailsManager.userExists("developer")){
-            UserDetails user = User.withDefaultPasswordEncoder()
-                    .username("developer")
-                    .password("password")
-                    .accountExpired(false)
-                    .accountLocked(false)
-                    .credentialsExpired(false)
-                    .authorities( "DEVELOPER")
-                    .build();
-            detailsManager.createUser(user);
-        }
-
-        if(!jpaAuthorityService.authorityExists("ROLE_USER")){
+        /*if(!jpaAuthorityService.authorityExists("ROLE_USER")){
             Authority authority = new Authority();
             authority.setAuthority("ROLE_USER");
             jpaAuthorityService.createAuthority(authority);
@@ -138,7 +102,47 @@ public class AuthorizationServerConfig {
             Authority developer = new Authority();
             developer.setAuthority("ROLE_DEVELOPER");
             jpaAuthorityService.createAuthority(developer);
+        }*/
+
+        if(!detailsManager.userExists("user")){
+            UserDetails user = User.withDefaultPasswordEncoder()
+                    .username("user")
+                    .password("password")
+                    .roles("USER", "ADMIN")
+                    .accountExpired(true)
+                    .accountLocked(true)
+                    .credentialsExpired(true)
+                    .authorities("ROLE_USER")
+                    .build();
+            detailsManager.createUser(user);
         }
+
+        if(!detailsManager.userExists("admin")){
+            UserDetails user = User.withDefaultPasswordEncoder()
+                    .username("admin")
+                    .password("password")
+                    .accountExpired(true)
+                    .accountLocked(true)
+                    .credentialsExpired(true)
+                    .authorities( "ROLE_ADMIN")
+                    .build();
+
+            detailsManager.createUser(user);
+        }
+
+        if(!detailsManager.userExists("developer")){
+            UserDetails user = User.withDefaultPasswordEncoder()
+                    .username("developer")
+                    .password("password")
+                    .accountExpired(true)
+                    .accountLocked(true)
+                    .credentialsExpired(true)
+                    .authorities( "ROLE_DEVELOPER")
+                    .build();
+
+            detailsManager.createUser(user);
+        }
+
     }
 
 
@@ -153,7 +157,8 @@ public class AuthorizationServerConfig {
     @Bean
     public TokenSettings tokenSettings() {
         return TokenSettings.builder().accessTokenFormat(OAuth2TokenFormat.SELF_CONTAINED)
-                .accessTokenTimeToLive(Duration.ofMinutes(1))
+                .refreshTokenTimeToLive(Duration.ofDays(180))
+                .accessTokenTimeToLive(Duration.ofMinutes(30))
                 .build();
     }
 
@@ -183,6 +188,8 @@ public class AuthorizationServerConfig {
             }
         };
     }
+
+
 }
 
 
