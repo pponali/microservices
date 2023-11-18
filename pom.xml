@@ -53,5 +53,17 @@
 			</plugin>
 		</plugins>
 	</build>
+	<modules>
+		<module>integrations</module>
+		<module>authorization</module>
+		<module>common</module>
+		<module>config-server</module>
+		<module>discovery</module>
+		<module>netflix</module>
+		<module>gateway</module>
+		<module>resource-server</module>
+	</modules>
+
+	<packaging>pom</packaging>
 
 </project>
