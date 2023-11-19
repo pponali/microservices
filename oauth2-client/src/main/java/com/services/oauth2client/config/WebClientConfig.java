@@ -32,7 +32,7 @@ public class WebClientConfig {
                 new ServletOAuth2AuthorizedClientExchangeFilterFunction(authorizedClientManager);
         filterFunction.setDefaultOAuth2AuthorizedClient(true);
         WebClient webClient = WebClient.builder().apply(filterFunction.oauth2Configuration()).build();
-        WebClientAdapter webClientAdapter = WebClientAdapter.create(webClient);
+       // WebClientAdapter webClientAdapter = WebClientAdapter.create(webClient);
         return HttpServiceProxyFactory.builder().build();
     }
     @Bean
