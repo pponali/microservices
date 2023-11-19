@@ -27,10 +27,7 @@ public class JpaAuthorityService {
 
     public boolean authorityExists(final String username) {
         Optional<Authority> authority =  jpaAuthorityRepository.findByAuthority(username);
-        if(authority.isPresent()){
-            return true;
-        }
-        return false;
+        return authority.isEmpty();
     }
 
 }

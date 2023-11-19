@@ -14,6 +14,7 @@ import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
+import org.springframework.security.config.annotation.web.configurers.oauth2.server.resource.OAuth2ResourceServerConfigurer;
 import org.springframework.security.oauth2.server.authorization.config.annotation.web.configuration.OAuth2AuthorizationServerConfiguration;
 import org.springframework.security.oauth2.server.authorization.config.annotation.web.configurers.OAuth2AuthorizationServerConfigurer;
 import org.springframework.security.web.SecurityFilterChain;
@@ -43,9 +44,7 @@ public class SecurityConfig {
         http.getConfigurer(OAuth2AuthorizationServerConfigurer.class).oidc(Customizer.withDefaults());
         http.exceptionHandling(e -> e.authenticationEntryPoint(new LoginUrlAuthenticationEntryPoint("/login")));
         return http.formLogin(Customizer.withDefaults()).build();
-
     }
-
 
     @Bean
     public JWKSource<SecurityContext> jwkSource() throws NoSuchAlgorithmException {
@@ -63,7 +62,8 @@ public class SecurityConfig {
         return new RSAKey.Builder(publicKey).privateKey(privateKey)
                 .keyUse(KeyUse.SIGNATURE)
                 .algorithm(JWSAlgorithm.RS256)
-                .keyID("bael-key-id").build();
+                .keyID("bael-key-id")
+                .build();
     }
 
     private static KeyPair generateRsaKey() throws NoSuchAlgorithmException {
@@ -75,15 +75,10 @@ public class SecurityConfig {
 
     @Bean
     SecurityFilterChain configureSecurityFilterChain(HttpSecurity http) throws Exception {
-
-        http   .csrf(AbstractHttpConfigurer::disable) .cors(AbstractHttpConfigurer::disable).authorizeHttpRequests(authorizeRequests -> authorizeRequests.requestMatchers("/.well-known/openid-configuration").permitAll())
-                .authorizeHttpRequests(authorizeRequests -> authorizeRequests.anyRequest().authenticated())
-                .formLogin(Customizer.withDefaults());
-
+        http.csrf(AbstractHttpConfigurer::disable) .cors(AbstractHttpConfigurer::disable)
+            .authorizeHttpRequests(authorizeRequests -> authorizeRequests.requestMatchers("/.well-known/openid-configuration").permitAll())
+            .authorizeHttpRequests(authorizeRequests -> authorizeRequests.anyRequest().authenticated())
+            .formLogin(Customizer.withDefaults());
         return http.build();
-
     }
-
-
-
 }

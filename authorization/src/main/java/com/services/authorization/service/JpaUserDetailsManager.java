@@ -2,6 +2,7 @@ package com.services.authorization.service;
 
 import com.services.authorization.entity.Authority;
 import com.services.authorization.entity.SecurityUser;
+import com.services.authorization.repository.JpaAuthorityRepository;
 import com.services.authorization.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -29,6 +30,9 @@ public class JpaUserDetailsManager implements UserDetailsManager {
     @Autowired
     private UserRepository userRepository;
 
+    @Autowired
+    private JpaAuthorityRepository jpaAuthorityRepository;
+
     @Override
     public void createUser(final UserDetails user) {
         SecurityUser securityUser = new SecurityUser();
@@ -36,9 +40,9 @@ public class JpaUserDetailsManager implements UserDetailsManager {
         securityUser.setPassword(user.getPassword());
         Set<Authority> authorities = new HashSet<>();
         for (GrantedAuthority authority : user.getAuthorities()) {
-            Authority userAuthorities = new Authority();
-            userAuthorities.setAuthority(authority.getAuthority());
-            authorities.add(userAuthorities);
+            if(jpaAuthorityRepository.findByAuthority(authority.getAuthority()).isPresent()){
+                authorities.add(jpaAuthorityRepository.findByAuthority(authority.getAuthority()).get());
+            }
         }
         securityUser.setAuthorities(authorities);
         userRepository.save(securityUser);

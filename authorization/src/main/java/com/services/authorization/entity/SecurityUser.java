@@ -18,7 +18,6 @@ import java.util.Set;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-
 public class SecurityUser {
 
 
@@ -38,21 +37,12 @@ public class SecurityUser {
             @JoinColumn(name = "USERS_ID", referencedColumnName = "ID")}, inverseJoinColumns = {
             @JoinColumn(name = "AUTHORITIES_ID", referencedColumnName = "ID")
     })
-    @ManyToMany(cascade = {CascadeType.MERGE, CascadeType.PERSIST, CascadeType.REFRESH} , fetch = FetchType.EAGER)
+    @ManyToMany(cascade = {CascadeType.MERGE} , fetch = FetchType.EAGER)
     private Set<Authority> authorities;
 
-    private Boolean accountNonExpired = Boolean.FALSE;
-    private Boolean accountNonLocked = Boolean.FALSE;
+    private Boolean accountNonExpired = Boolean.TRUE;
+    private Boolean accountNonLocked = Boolean.TRUE;
     private Boolean enabled = Boolean.TRUE;
-    private Boolean credentialsNonExpired  = Boolean.FALSE;
-
-
-
-
-
-
-
-
-
+    private Boolean credentialsNonExpired  = Boolean.TRUE;
 
 }

@@ -65,6 +65,7 @@ public class AuthorizationServerConfig {
                     .authorizationGrantType(AuthorizationGrantType.DEVICE_CODE)
                     .redirectUri("http://auth-server:8080/login/oauth2/code/articles-client-oidc")
                     .redirectUri("http://auth-server:8080/login/oauth2/code/api-client")
+                    .redirectUri("http://localhost:5555/login/oauth2/code/myoauth2")
                     .redirectUri("http://127.0.0.1:8080/authorized")
                     .redirectUri("https://oauthdebugger.com/debug")
                     .redirectUri("https://oidcdebugger.com/debug")
@@ -84,34 +85,32 @@ public class AuthorizationServerConfig {
                     .build();
             clientRepository.save(registeredClient);
         }
-
-
-        /*if(!jpaAuthorityService.authorityExists("ROLE_USER")){
+        if(jpaAuthorityService.authorityExists("ROLE_USER")){
             Authority authority = new Authority();
             authority.setAuthority("ROLE_USER");
             jpaAuthorityService.createAuthority(authority);
         }
 
-        if(!jpaAuthorityService.authorityExists("ROLE_ADMIN")){
+        if(jpaAuthorityService.authorityExists("ROLE_ADMIN")){
             Authority admin = new Authority();
             admin.setAuthority("ROLE_ADMIN");
             jpaAuthorityService.createAuthority(admin);
         }
 
-        if(!jpaAuthorityService.authorityExists("ROLE_DEVELOPER")){
+        if(jpaAuthorityService.authorityExists("ROLE_DEVELOPER")){
             Authority developer = new Authority();
             developer.setAuthority("ROLE_DEVELOPER");
             jpaAuthorityService.createAuthority(developer);
-        }*/
+        }
 
         if(!detailsManager.userExists("user")){
             UserDetails user = User.withDefaultPasswordEncoder()
                     .username("user")
                     .password("password")
                     .roles("USER", "ADMIN")
-                    .accountExpired(true)
-                    .accountLocked(true)
-                    .credentialsExpired(true)
+                    .accountExpired(Boolean.TRUE)
+                    .accountLocked(Boolean.TRUE)
+                    .credentialsExpired(Boolean.TRUE)
                     .authorities("ROLE_USER")
                     .build();
             detailsManager.createUser(user);
@@ -121,12 +120,11 @@ public class AuthorizationServerConfig {
             UserDetails user = User.withDefaultPasswordEncoder()
                     .username("admin")
                     .password("password")
-                    .accountExpired(true)
-                    .accountLocked(true)
-                    .credentialsExpired(true)
+                    .accountExpired(Boolean.TRUE)
+                    .accountLocked(Boolean.TRUE)
+                    .credentialsExpired(Boolean.TRUE)
                     .authorities( "ROLE_ADMIN")
                     .build();
-
             detailsManager.createUser(user);
         }
 
@@ -134,12 +132,11 @@ public class AuthorizationServerConfig {
             UserDetails user = User.withDefaultPasswordEncoder()
                     .username("developer")
                     .password("password")
-                    .accountExpired(true)
-                    .accountLocked(true)
-                    .credentialsExpired(true)
+                    .accountExpired(Boolean.TRUE)
+                    .accountLocked(Boolean.TRUE)
+                    .credentialsExpired(Boolean.TRUE)
                     .authorities( "ROLE_DEVELOPER")
                     .build();
-
             detailsManager.createUser(user);
         }
 
@@ -158,7 +155,7 @@ public class AuthorizationServerConfig {
     public TokenSettings tokenSettings() {
         return TokenSettings.builder().accessTokenFormat(OAuth2TokenFormat.SELF_CONTAINED)
                 .refreshTokenTimeToLive(Duration.ofDays(180))
-                .accessTokenTimeToLive(Duration.ofMinutes(30))
+                .accessTokenTimeToLive(Duration.ofMinutes(180))
                 .build();
     }
 
@@ -188,8 +185,6 @@ public class AuthorizationServerConfig {
             }
         };
     }
-
-
 }
 
 
