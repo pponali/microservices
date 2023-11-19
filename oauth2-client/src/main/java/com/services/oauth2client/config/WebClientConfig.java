@@ -8,7 +8,10 @@ import org.springframework.security.oauth2.client.registration.ClientRegistratio
 import org.springframework.security.oauth2.client.web.DefaultOAuth2AuthorizedClientManager;
 import org.springframework.security.oauth2.client.web.OAuth2AuthorizedClientRepository;
 import org.springframework.security.oauth2.client.web.reactive.function.client.ServletOAuth2AuthorizedClientExchangeFilterFunction;
+import org.springframework.web.reactive.function.client.WebClient;
+import org.springframework.web.reactive.function.client.support.WebClientAdapter;
 import org.springframework.web.service.annotation.GetExchange;
+import org.springframework.web.service.invoker.HttpClientAdapter;
 import org.springframework.web.service.invoker.HttpServiceProxyFactory;
 
 /**
@@ -24,13 +27,13 @@ public class WebClientConfig {
     }
 
     @Bean
-
     HttpServiceProxyFactory httpProxyFactory(OAuth2AuthorizedClientManager authorizedClientManager) {
         ServletOAuth2AuthorizedClientExchangeFilterFunction filterFunction =
                 new ServletOAuth2AuthorizedClientExchangeFilterFunction(authorizedClientManager);
         filterFunction.setDefaultOAuth2AuthorizedClient(true);
-        WebClient
-        return HttpServiceProxyFactory.builder(WelcomeClient.class).build();
+        WebClient webClient = WebClient.builder().apply(filterFunction.oauth2Configuration()).build();
+        WebClientAdapter webClientAdapter = WebClientAdapter.create(webClient);
+        return HttpServiceProxyFactory.builder().build();
     }
     @Bean
     OAuth2AuthorizedClientManager oAuth2AuthorizedClientManager(ClientRegistrationRepository clientRegistrationRepository,
