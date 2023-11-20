@@ -9,7 +9,7 @@
 		<relativePath/> <!-- lookup parent from repository -->
 	</parent>
 	<groupId>com.services</groupId>
-	<artifactId>parent</artifactId>
+	<artifactId>microservices</artifactId>
 	<version>0.0.1-SNAPSHOT</version>
 	<name>microservices</name>
 	<description>microservices</description>
