@@ -1,30 +1,22 @@
 package com.services.oauth2client.config;
 
-import com.services.oauth2client.filter.CustomSecurityFilter;
+import com.services.oauth2client.filter.LoggingFilter;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.boot.jdbc.DataSourceBuilder;
 import org.springframework.context.ApplicationListener;
 import org.springframework.context.annotation.Bean;
+import org.springframework.core.Ordered;
 import org.springframework.core.annotation.Order;
-import org.springframework.http.HttpMethod;
 import org.springframework.security.authentication.event.AuthenticationFailureBadCredentialsEvent;
 import org.springframework.security.authentication.event.AuthenticationFailureExpiredEvent;
 import org.springframework.security.authentication.event.AuthenticationSuccessEvent;
 import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
-import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
-import org.springframework.security.core.userdetails.User;
-import org.springframework.security.core.userdetails.UserDetails;
-import org.springframework.security.core.userdetails.UserDetailsService;
-import org.springframework.security.core.userdetails.UsernameNotFoundException;
-import org.springframework.security.crypto.password.NoOpPasswordEncoder;
-import org.springframework.security.crypto.password.PasswordEncoder;
-import org.springframework.security.provisioning.JdbcUserDetailsManager;
 import org.springframework.security.web.SecurityFilterChain;
-import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+import org.springframework.security.web.header.HeaderWriterFilter;
+import org.springframework.security.web.session.DisableEncodeUrlFilter;
 
-import javax.sql.DataSource;
+import static org.springframework.security.config.Customizer.withDefaults;
 
 /**
  * @Author prakashponali
@@ -33,20 +25,33 @@ import javax.sql.DataSource;
  */
 @EnableWebSecurity
 @Slf4j
-public class SecurityConfig  {
+public class SecurityConfig_backup  {
 
     @Bean
-    SecurityFilterChain configureFilterChain(HttpSecurity http) throws  Exception{
+    @Order(Ordered.HIGHEST_PRECEDENCE)
+    SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
+        /*http
+                .csrf().disable()
+                .cors().disable()
+                .authorizeHttpRequests(authorize -> authorize
+                        .anyRequest().permitAll()) //.authenticated())
+                .oauth2Login(withDefaults())
+                .oauth2Client(withDefaults());
+        http.addFilterBefore(new LoggingFilter(), HeaderWriterFilter.class);*/
+        return http.build();
+    }
+    /*SecurityFilterChain configureFilterChain(HttpSecurity http) throws  Exception{
         http.authorizeHttpRequests(authconfig -> authconfig.anyRequest().authenticated())
                 .oauth2Login(oath2 -> oath2.loginPage("/oauth2/authorization/myoauth2"))
                 .oauth2Client(Customizer.withDefaults());
-        return http.build();
-    }
+        http.addFilterBefore(new LoggingFilter(), HeaderWriterFilter.class);
 
+        return http.build();
+    }*/
+/*
     @Bean
     @Order(100)
     SecurityFilterChain configureSecurityFilterChain(HttpSecurity http) throws Exception {
-        log.info("");
         http   .csrf(AbstractHttpConfigurer::disable)
                 .cors(AbstractHttpConfigurer::disable)
                 .headers(Customizer.withDefaults())
@@ -113,26 +118,7 @@ public class SecurityConfig  {
                 .build();
     }
 
-    @Bean
-    ApplicationListener<AuthenticationSuccessEvent> authenticationSuccessListener() {
-        return event -> {
-            log.error("Success long in " + event.getAuthentication().getClass().getName() + " - " + event.getAuthentication().getName());
-        };
-    }
 
-    @Bean
-    ApplicationListener<AuthenticationFailureBadCredentialsEvent> authenticationFailureBadCredentialsListener() {
-        return event -> {
-            log.error("Failure long in " + event.getAuthentication().getClass().getName() + " - " + event.getAuthentication().getName());
-        };
-    }
-
-    @Bean
-    ApplicationListener<AuthenticationFailureExpiredEvent> authenticationFailureExpiredEventListener() {
-        return event -> {
-            log.error("Failure long in " + event.getAuthentication().getClass().getName() + " - " + event.getAuthentication().getName());
-        };
-    }
 
     @Bean
     UserDetailsService  userDetailsService() {
@@ -158,6 +144,28 @@ public class SecurityConfig  {
     @Bean
     PasswordEncoder  passwordEncoder() {
         return NoOpPasswordEncoder.getInstance();
+    }*/
+
+
+    @Bean
+    ApplicationListener<AuthenticationSuccessEvent> authenticationSuccessListener() {
+        return event -> {
+            log.error("Success long in " + event.getAuthentication().getClass().getName() + " - " + event.getAuthentication().getName());
+        };
+    }
+
+    @Bean
+    ApplicationListener<AuthenticationFailureBadCredentialsEvent> authenticationFailureBadCredentialsListener() {
+        return event -> {
+            log.error("Failure long in " + event.getAuthentication().getClass().getName() + " - " + event.getAuthentication().getName());
+        };
+    }
+
+    @Bean
+    ApplicationListener<AuthenticationFailureExpiredEvent> authenticationFailureExpiredEventListener() {
+        return event -> {
+            log.error("Failure long in " + event.getAuthentication().getClass().getName() + " - " + event.getAuthentication().getName());
+        };
     }
 
 

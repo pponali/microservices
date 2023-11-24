@@ -1,5 +1,6 @@
 package com.services.authorization.entity;
 
+import com.services.authorization.annotations.ValidEmail;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -44,5 +45,7 @@ public class SecurityUser {
     private Boolean accountNonLocked = Boolean.TRUE;
     private Boolean enabled = Boolean.TRUE;
     private Boolean credentialsNonExpired  = Boolean.TRUE;
+    //@ValidEmail
+    private String email;
 
 }

@@ -15,3 +15,15 @@ spring:
           myoauth2:
             client-id: api-client
             client-secret: secret
+
+
+resilience4j:
+  retry:
+    configs:
+      default:
+        max-attempts: 5
+        waitDuration: 100ms
+    instances:
+      retryServices:
+        base-config: default
+

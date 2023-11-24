@@ -1,9 +1,11 @@
 package com.services.authorization.service;
 
 import com.services.authorization.entity.Authority;
+import com.services.authorization.entity.SecurityUser;
 import com.services.authorization.repository.JpaAuthorityRepository;
 import org.springframework.stereotype.Service;
 
+import java.util.Arrays;
 import java.util.Optional;
 
 /**
@@ -28,6 +30,7 @@ public class JpaAuthorityService {
     public boolean authorityExists(final String username) {
         Optional<Authority> authority =  jpaAuthorityRepository.findByAuthority(username);
         return authority.isEmpty();
+
     }
 
 }

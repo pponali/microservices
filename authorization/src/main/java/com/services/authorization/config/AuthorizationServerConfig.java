@@ -8,13 +8,19 @@ import jakarta.annotation.PostConstruct;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.core.annotation.Order;
+import org.springframework.security.config.Customizer;
+import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.oauth2.core.AuthorizationGrantType;
 import org.springframework.security.oauth2.core.ClientAuthenticationMethod;
+import org.springframework.security.oauth2.core.OAuth2Token;
 import org.springframework.security.oauth2.core.oidc.OidcScopes;
+import org.springframework.security.oauth2.core.oidc.endpoint.OidcParameterNames;
+import org.springframework.security.oauth2.server.authorization.OAuth2TokenType;
 import org.springframework.security.oauth2.server.authorization.client.RegisteredClient;
 import org.springframework.security.oauth2.server.authorization.settings.AuthorizationServerSettings;
 import org.springframework.security.oauth2.server.authorization.settings.ClientSettings;
@@ -22,6 +28,7 @@ import org.springframework.security.oauth2.server.authorization.settings.OAuth2T
 import org.springframework.security.oauth2.server.authorization.settings.TokenSettings;
 import org.springframework.security.oauth2.server.authorization.token.JwtEncodingContext;
 import org.springframework.security.oauth2.server.authorization.token.OAuth2TokenCustomizer;
+import org.springframework.security.web.SecurityFilterChain;
 
 import java.time.Duration;
 import java.util.Set;
@@ -66,6 +73,7 @@ public class AuthorizationServerConfig {
                     .redirectUri("http://auth-server:8080/login/oauth2/code/articles-client-oidc")
                     .redirectUri("http://auth-server:8080/login/oauth2/code/api-client")
                     .redirectUri("http://localhost:5555/login/oauth2/code/myoauth2")
+                    .redirectUri("http://localhost:3333/login/oauth2/code/spring")
                     .redirectUri("http://127.0.0.1:8080/authorized")
                     .redirectUri("https://oauthdebugger.com/debug")
                     .redirectUri("https://oidcdebugger.com/debug")
@@ -143,12 +151,22 @@ public class AuthorizationServerConfig {
     }
 
 
+
     @Bean
-    public AuthorizationServerSettings authorizationServerSettings() {
+    AuthorizationServerSettings authorizationServerSettings() {
         return AuthorizationServerSettings.builder()
                 .issuer("http://auth-server:8080")
+                .authorizationEndpoint("/oauth2/authorize")
+                .tokenEndpoint("/oauth2/token")
+                .tokenIntrospectionEndpoint("/oauth2/introspect")
+                .tokenRevocationEndpoint("/oauth2/revoke")
+                .jwkSetEndpoint("/oauth2/jwks")
+                .oidcUserInfoEndpoint("/userinfo")
+                //.oidcClientRegistrationEndpoint("/clientregistration")
                 .build();
     }
+
+
 
 
     @Bean
@@ -170,13 +188,14 @@ public class AuthorizationServerConfig {
 
 
     @Bean
-    OAuth2TokenCustomizer<JwtEncodingContext> tokenCustomizer() {
+    OAuth2TokenCustomizer<JwtEncodingContext> tokenCustomizer(OidcUserInfoService oidcUserInfoService) {
         return context -> {
             Authentication principle = context.getPrincipal();
-            if (context.getTokenType().getValue().equals("id_token")) {
+            if (OidcParameterNames.ID_TOKEN.equals(context.getTokenType().getValue())) {
+                //oidcUserInfoService.addClaims(context);
                 context.getClaims().claim("test", "Test Id token");
             }
-            if (context.getTokenType().getValue().equals("access_token")) {
+            if (OAuth2TokenType.ACCESS_TOKEN.toString().equals(context.getTokenType().getValue())) {
                 context.getClaims().claim("test", "Test access token");
                 Set<String> authorities = principle.getAuthorities().stream()
                         .map(GrantedAuthority::getAuthority).collect(Collectors.toSet());

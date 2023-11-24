@@ -1,0 +1,66 @@
+server:
+  port: 3333
+
+logging:
+  level:
+    org.springframework.cloud.gateway: TRACE
+
+spring:
+  application:
+    name: springoauthclient
+  security:
+    oauth2:
+      client:
+        registration:
+          gateway:
+            provider: spring
+            client-id: api-client
+            client-secret: secret
+            scope: read,openid
+            authorization-grant-type: authorization_code
+            redirect-uri: http://localhost:3333/login/oauth2/code/spring
+        provider:
+          spring:
+            issuer-uri: http://auth-server:8080
+  session:
+    store-type: redis
+  data:
+    redis:
+      host: localhost
+      port: 6379
+      password: password
+      username:
+  cloud:
+    gateway:
+      default-filters:
+        - TokenRelay=
+        - SaveSession
+      routes:
+        - id: route
+          uri: http://localhost:8090
+          predicates:
+            - Path=/**
+          filters:
+            - name: CircuitBreaker
+              args:
+                name: resourceServer
+                fallbackUri: forward:/fallback
+            - name: Retry
+              args:
+                retries: 30
+                methods: GET
+                backoff:
+                  firstBackoff: 10ms
+                  maxBackoff: 500ms
+resilience4j:
+  circuitbreaker:
+    instances:
+      resourceServer:
+        slidingWindowSize: 10
+        permittedNumberOfCallsInHalfOpenState: 5
+        failureRateThreshold: 50
+        waitDurationInOpenState: 10000
+  timelimiter:
+    configs:
+      resourceServer:
+        timeoutDuration: 20s

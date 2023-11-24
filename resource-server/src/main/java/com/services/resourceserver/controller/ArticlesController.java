@@ -11,6 +11,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.security.Principal;
+import java.time.LocalDateTime;
 
 
 /**
@@ -29,10 +30,6 @@ public class ArticlesController {
         return new String[] { "Article 1", "Article 2", "Article 3" };
     }
 
-    @GetMapping("/public")
-    public String publicEndpoint() {
-        return "This is a public endpoint. No token required.";
-    }
 
     @GetMapping("/protected")
     @PreAuthorize("hasRole('ROLE_USER') and hasPermission('read')")
@@ -48,6 +45,6 @@ public class ArticlesController {
             System.out.println("JWT Token: " + ((JwtAuthenticationToken) principal).getToken());
         }
         System.out.println("Principal: " + principal.getName());
-        return "This is a protected endpoint. Token with 'ROLE_USER' required. The current user is " + authentication.getPrincipal();
+        return "This is a protected endpoint. Token with 'ROLE_USER' required. The current user is " + authentication.getPrincipal() + " date and time " + LocalDateTime.now();
     }
 }
