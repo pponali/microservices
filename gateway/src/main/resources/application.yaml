@@ -39,7 +39,7 @@ spring:
         - id: route
           uri: http://localhost:8090
           predicates:
-            - Path=/**
+            - Path=/articles/protected
           filters:
             - name: CircuitBreaker
               args:

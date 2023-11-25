@@ -6,6 +6,7 @@ import com.nimbusds.jose.jwk.KeyUse;
 import com.nimbusds.jose.jwk.RSAKey;
 import com.nimbusds.jose.jwk.source.JWKSource;
 import com.nimbusds.jose.proc.SecurityContext;
+import com.services.authorization.filter.LogFilter;
 import com.services.authorization.filter.LoggingFilter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
@@ -53,7 +54,7 @@ public class SecurityConfig {
     @Order(100)
     public SecurityFilterChain authServerSecurityFilterChain(HttpSecurity http) throws Exception {
         OAuth2AuthorizationServerConfiguration.applyDefaultSecurity(http);
-        http.addFilterBefore(new LoggingFilter(), UsernamePasswordAuthenticationFilter.class);
+        http.addFilterBefore(new LogFilter(), UsernamePasswordAuthenticationFilter.class);
 
         http.getConfigurer(OAuth2AuthorizationServerConfigurer.class)//.oidc(Customizer.withDefaults());
          .oidc((oidc) -> oidc
