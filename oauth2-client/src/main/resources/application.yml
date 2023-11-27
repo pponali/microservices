@@ -15,15 +15,73 @@ spring:
           myoauth2:
             client-id: api-client
             client-secret: secret
-
-
 resilience4j:
   retry:
     configs:
       default:
         max-attempts: 5
         waitDuration: 100ms
+        maxAttempts:
+        eventConsumerBufferSize:
+        enableExponentialBackoff:
+        exponentialBackoffMultiplier:
+        exponentialMaxWaitDuration:
+        enableRandomizedWait:
+        randomizedWaitFactor:
+        failAfterMaxAttempts:
+
     instances:
       retryServices:
         base-config: default
+    metrics:
+      enabled: true
+  ratelimiter:
+    metrics:
+      enabled: true
+    instances:
+      default:
+        limitForPeriod:
+        limitRefreshPeriod:
+        timeoutDuration:
+        subscribeForEvents:
+        allowHealthIndicatorToFail:
+        registerHealthIndicator:
+        eventConsumerBufferSize:
+        writableStackTraceEnabled:
+
+
+  bulkhead:
+    configs:
+      default:
+        maxConcurrentCalls:
+        maxWaitDuration:
+        writableStackTraceEnabled:
+        eventConsumerBufferSize:
+
+    instances:
+      retryServices:
+        base-config: default
+
+    metrics:
+      enabled: true
+  circuitbreaker:
+    metrics:
+      enabled: true
+    configs:
+      default:
+        waitDurationInOpenState:
+        slowCallDurationThreshold:
+        maxWaitDurationInHalfOpenState:
+        failureRateThreshold:
+        slowCallRateThreshold:
+
+    instances:
+      retryServices:
+        base-config: default
+
+
+
+
+
+
 
