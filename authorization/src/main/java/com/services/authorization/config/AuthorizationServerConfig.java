@@ -68,6 +68,7 @@ public class AuthorizationServerConfig {
                     .authorizationGrantType(AuthorizationGrantType.AUTHORIZATION_CODE)
                     .authorizationGrantType(AuthorizationGrantType.REFRESH_TOKEN)
                     .authorizationGrantType(AuthorizationGrantType.JWT_BEARER)
+                    .authorizationGrantType(AuthorizationGrantType.PASSWORD)
                     .authorizationGrantType(AuthorizationGrantType.CLIENT_CREDENTIALS)
                     .authorizationGrantType(AuthorizationGrantType.DEVICE_CODE)
                     .redirectUri("http://auth-server:8080/login/oauth2/code/articles-client-oidc")

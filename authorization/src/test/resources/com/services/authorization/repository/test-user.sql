@@ -1,0 +1,1 @@
+INSERT into users (123, "testuser","password", null, true, true, true, true, "user@gmail.com");

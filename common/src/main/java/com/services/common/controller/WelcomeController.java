@@ -19,6 +19,7 @@ import java.time.LocalDateTime;
 public class WelcomeController {
 
     private final AsyncService asyncService;
+    @SneakyThrows
     public WelcomeController(AsyncService asyncService) {
         this.asyncService = asyncService;
     }
