@@ -8,8 +8,16 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
+import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
+import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
+import org.springframework.test.context.ActiveProfiles;
+import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
+import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
@@ -22,20 +30,21 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
  * @Description
  */
 
-@ExtendWith(MockitoExtension.class)
+@AutoConfigureMockMvc(addFilters = false)
+@ActiveProfiles("test")
+@TestPropertySource(locations = "classpath:application-test.properties")
+@WebMvcTest(controllers = SecurityController.class)
 class SecurityControllerTest {
 
-    private MockMvc mockMvc;
+    @MockBean
+    private JpaUserDetailsManager userDetailsManager;
 
-    @Mock
-    private JpaUserDetailsManager itemService;
-
-    @InjectMocks
-    private SecurityController securityController;
+    @Autowired
+    MockMvc mockMvc;
 
     @BeforeEach
     void setUp() {
-        mockMvc = MockMvcBuilders.standaloneSetup(securityController).build();
+
     }
 
     @AfterEach
@@ -52,16 +61,8 @@ class SecurityControllerTest {
 
     @Test
     public void getItemByIdTest() throws Exception {
-        Long itemId = 1L;
-        //Item mockItem = new Item(itemId, "ItemName", "Description", 9.99);
-        //when(itemService.findById(itemId)).thenReturn(Optional.of(mockItem));
+        mockMvc.perform(MockMvcRequestBuilders.get("/api/v1/index")).andExpect(MockMvcResultMatchers.status().is(200));
 
-        mockMvc.perform(get("/api/items/" + itemId)
-                        .contentType(MediaType.APPLICATION_JSON))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$.id").value(itemId))
-                .andExpect(jsonPath("$.name").value("ItemName"));
 
-        //verify(itemService).findById(itemId);
     }
 }

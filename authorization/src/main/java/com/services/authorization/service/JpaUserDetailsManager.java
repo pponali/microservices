@@ -16,6 +16,7 @@ import org.springframework.stereotype.Service;
 
 import java.util.Collection;
 import java.util.HashSet;
+import java.util.Optional;
 import java.util.Set;
 
 /**
@@ -65,28 +66,35 @@ public class JpaUserDetailsManager implements UserDetailsManager {
     }
 
     @Override
-    public boolean userExists(final String username) {
-        SecurityUser securityUser =  userRepository.findByUsername(username);
-        return securityUser != null;
+    public boolean userExists(final String username) throws UsernameNotFoundException {
+        Optional<SecurityUser> securityUser =  userRepository.findByUsername(username);
+        if(securityUser.isPresent())
+        {
+            return true;
+        } else {
+            throw new UsernameNotFoundException("User " + username + " not found");
+        }
     }
 
     @Override
     public UserDetails loadUserByUsername(final String username) throws UsernameNotFoundException {
-        SecurityUser securityUser = userRepository.findByUsername(username);
-        if(securityUser == null){
+        Optional<SecurityUser> securityUser = userRepository.findByUsername(username);
+
+        if(securityUser.isEmpty()){
             throw new UsernameNotFoundException("User Access denied");
         }
+        SecurityUser user =  securityUser.get();
         Collection<GrantedAuthority> authorities = new HashSet<>();
-        securityUser.getAuthorities().forEach(authority -> {
+        user.getAuthorities().forEach(authority -> {
             authorities.add(new SimpleGrantedAuthority(authority.getAuthority()));
         });
 
-        return new User(securityUser.getUsername(),
-                securityUser.getPassword(),
-                securityUser.getEnabled(),
-                securityUser.getAccountNonExpired(),
-                securityUser.getCredentialsNonExpired(),
-                securityUser.getAccountNonLocked(),
+        return new User(user.getUsername(),
+                user.getPassword(),
+                user.getEnabled(),
+                user.getAccountNonExpired(),
+                user.getCredentialsNonExpired(),
+                user.getAccountNonLocked(),
                 authorities);
 
     }

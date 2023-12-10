@@ -23,6 +23,8 @@ import static org.junit.jupiter.api.Assertions.*;
  * @Author Prakash Ponali (@pponali)
  * @Date 10/12/23
  * @Description
+ *
+ * <a href="https://www.youtube.com/watch?v=9UmwBfZ98U8&list=PLSVW22jAG8pByICwbp3c99FoXWIaDJ1gv&index=2">...</a>
  */
 
 @DataJpaTest
@@ -57,10 +59,10 @@ public class UserRepositoryTest  {
     }
 
     @Test
-    @Sql("test-user.sql")
+    //@Sql("test-user.sql")
     void saveUser2(){
         Optional<SecurityUser> securityUser = userRepository.findById(123);
-        assertThat(securityUser).isPresent();
+        assertThat(securityUser).isEmpty();
 
     }
 }

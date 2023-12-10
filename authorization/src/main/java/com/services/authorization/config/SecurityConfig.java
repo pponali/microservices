@@ -128,6 +128,7 @@ public class SecurityConfig {
                 .authorizeHttpRequests(authorizeRequests -> authorizeRequests.requestMatchers(HttpMethod.POST, "/login").permitAll())
                 .authorizeHttpRequests(authorizeRequests -> authorizeRequests.requestMatchers("/oauth2/authorization/**").permitAll())
                 .authorizeHttpRequests(authorizeRequests -> authorizeRequests.requestMatchers("/oauth2/token/**").permitAll())
+                .authorizeHttpRequests(authorizeRequests -> authorizeRequests.requestMatchers("/actuator/**").permitAll())
                 .authorizeHttpRequests(authorizeRequests -> authorizeRequests.requestMatchers("/**").permitAll())
                // .authorizeHttpRequests(authorizeRequests -> authorizeRequests.requestMatchers("/oauth2/introspect").permitAll())
                // .authorizeHttpRequests(authorizeRequests -> authorizeRequests.requestMatchers("/userinfo").permitAll())

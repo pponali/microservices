@@ -14,7 +14,6 @@ import lombok.NoArgsConstructor;
 
 @Entity
 @Table(name="address")
-@Data
 @AllArgsConstructor
 @NoArgsConstructor
 public class Address extends Audit{

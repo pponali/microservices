@@ -26,7 +26,7 @@ import static org.junit.jupiter.api.Assertions.*;
 @AutoConfigureMockMvc(addFilters = false)
 @ActiveProfiles("test")
 @TestPropertySource(locations = "classpath:application-test.properties")
-@WebMvcTest
+@WebMvcTest(controllers = SecurityController.class)
 class SecurityControllerMvcTest {
 
     @MockBean

@@ -1,8 +1,6 @@
 package com.services.authorization.annotations;
 
 import jakarta.validation.Constraint;
-import org.hibernate.validator.internal.metadata.descriptor.ConstraintDescriptorImpl;
-
 import java.lang.annotation.Documented;
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
