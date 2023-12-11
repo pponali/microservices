@@ -39,7 +39,14 @@ public class AccountsController {
     private IAccountsService accountsService;
 
     @Operation(summary = "Create Account", description = "Create Account", tags = {"Accounts"})
-    @ApiResponse(responseCode = "201", description = "Response information after creating the account")
+    @ApiResponses({
+            @ApiResponse(responseCode = "201", description = "Response information after creating the account")
+            @ApiResponse(
+                    responseCode = "500",
+                    description = "If the create is failed",
+                    content = @Content(schema = @Schema(implementation = ErrorResponseDto.class))
+            )
+    })
     @ResponseStatus(HttpStatus.CREATED)
     @NotNull(message = "Customer details cannot be null")
     @Validated
@@ -53,6 +60,18 @@ public class AccountsController {
 
     }
 
+    @Operation(
+            summary = "Fetch Account",
+            description = "Fetch Account"
+    )
+    @ApiResponses({
+            @ApiResponse(responseCode = "201", description = "Response information after fetch the account"),
+            @ApiResponse(
+                    responseCode = "500",
+                    description = "If the fetch is failed",
+                    content = @Content(schema = @Schema(implementation = ErrorResponseDto.class))
+            )
+    })
     @GetMapping(value = "/fetch")
     public ResponseEntity<CustomerDto> fetchAccount(
             @Pattern(regexp = "(^$|[0-9]{10})",
@@ -76,14 +95,13 @@ public class AccountsController {
                     content = @Content(schema = @Schema(implementation = ErrorResponseDto.class))
             )
     })
-    @GetMapping(value = "/fetch")
+    @GetMapping(value = "/update")
     public ResponseEntity<CustomerDto> update(@Valid @RequestBody CustomerDto customerDto) {
         boolean updated = accountsService.updateAccount(customerDto);
         if (updated) {
             return ResponseEntity
                     .status(HttpStatus.CREATED)
                     .body(customerDto);
-
         } else {
             return ResponseEntity
                     .status(HttpStatus.NO_CONTENT)
@@ -97,10 +115,14 @@ public class AccountsController {
             description = "Delete Account"
     )
     @ApiResponses({
-            @ApiResponse(responseCode = "201", description = "Response information after deleting the account"),
-            @ApiResponse(responseCode = "500", description = "If the delete is failed")
+            @ApiResponse(responseCode = "201", description = "Response information after delete the account"),
+            @ApiResponse(
+                    responseCode = "500",
+                    description = "If the delete is failed",
+                    content = @Content(schema = @Schema(implementation = ErrorResponseDto.class))
+            )
     })
-    @GetMapping(value = "/fetch")
+    @GetMapping(value = "/delete")
     public ResponseEntity<?> delete(
             @Pattern(regexp = "(^$|[0-9]{10})",
                     message = "Mobile number should not contain the special chars.")
