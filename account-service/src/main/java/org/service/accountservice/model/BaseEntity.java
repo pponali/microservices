@@ -1,26 +1,39 @@
-package com.services.authorization.entity;
+package org.service.accountservice.model;
 
 import jakarta.persistence.*;
-import lombok.*;
+import lombok.EqualsAndHashCode;
+import lombok.Getter;
+import lombok.Setter;
+import lombok.ToString;
 import org.hibernate.annotations.GenericGenerator;
 import org.springframework.data.annotation.CreatedBy;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.LastModifiedBy;
 import org.springframework.data.annotation.LastModifiedDate;
+import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
-import java.time.LocalDate;
 import java.time.LocalDateTime;
 
 /**
- * @Author prakashponali
- * @Date 19/11/23
+ * @Author Prakash Ponali (@pponali)
+ * @Date 10/12/23
  * @Description
  */
 
-@MappedSuperclass
-@Getter @Setter @EqualsAndHashCode @ToString
-public class Audit {
 
+@MappedSuperclass
+@Getter
+@Setter
+@EqualsAndHashCode
+@ToString
+@EntityListeners(AuditingEntityListener.class)
+public class BaseEntity {
+
+    @GeneratedValue(strategy = GenerationType.AUTO, generator = "native")
+    @GenericGenerator(name = "native", parameters = @org.hibernate.annotations.Parameter(name = "sequence", value = "SEQ_ID"))
+    @Column(updatable = false, nullable = false, unique = true, length = 10, columnDefinition = "bigint")
+    @Id
+    Long id;
 
     @CreatedBy
     @Column(updatable = false)

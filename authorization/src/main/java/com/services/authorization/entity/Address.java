@@ -2,9 +2,7 @@ package com.services.authorization.entity;
 
 import jakarta.persistence.Entity;
 import jakarta.persistence.Table;
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
 /**
  * @Author prakashponali
@@ -16,6 +14,9 @@ import lombok.NoArgsConstructor;
 @Table(name="address")
 @AllArgsConstructor
 @NoArgsConstructor
+@Getter
+@Setter
+@ToString
 public class Address extends Audit{
     private String city;
     private String state;
