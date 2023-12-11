@@ -36,11 +36,15 @@ import java.util.Optional;
 @RequestMapping(path = "/api/v1", produces = {MediaType.APPLICATION_JSON_VALUE}, headers = "Accept=application/json")
 public class AccountsController {
 
-    private IAccountsService accountsService;
+    private final IAccountsService accountsService;
+
+    public AccountsController(IAccountsService accountsService) {
+        this.accountsService = accountsService;
+    }
 
     @Operation(summary = "Create Account", description = "Create Account", tags = {"Accounts"})
     @ApiResponses({
-            @ApiResponse(responseCode = "201", description = "Response information after creating the account")
+            @ApiResponse(responseCode = "201", description = "Response information after creating the account"),
             @ApiResponse(
                     responseCode = "500",
                     description = "If the create is failed",
