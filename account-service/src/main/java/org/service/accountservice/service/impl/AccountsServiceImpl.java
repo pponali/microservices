@@ -1,6 +1,7 @@
 package org.service.accountservice.service.impl;
 
 import lombok.AllArgsConstructor;
+import org.service.accountservice.constants.AccountsConstants;
 import org.service.accountservice.dto.AccountsDto;
 import org.service.accountservice.dto.CustomerDto;
 import org.service.accountservice.exception.CustomerAlreadyExistException;
@@ -13,6 +14,8 @@ import org.service.accountservice.repository.AccountsRepository;
 import org.service.accountservice.repository.CustomersRepository;
 import org.service.accountservice.service.IAccountsService;
 import org.springframework.stereotype.Service;
+
+import java.util.Random;
 
 /**
  * @Author Prakash Ponali (@pponali)
@@ -27,8 +30,14 @@ public class AccountsServiceImpl implements IAccountsService {
     private AccountsRepository accountsRepository;
 
     private CustomersRepository customersRepository;
+
+
     @Override
     public void createAccount(CustomerDto customerDto) {
+        Account newAccount = new Account();
+        int accountNumber = 1000000 + new Random(9000000).nextInt();
+        newAccount.setAccountNumber(Integer.toString(accountNumber));
+        newAccount.setAccountType(AccountsConstants.SAVINGS_ACCOUNT);
         Customer customer = CustomerMapper.INSTANCE.toEntity(customerDto);
         if(customersRepository.findByMobileNumber(customerDto.getMobileNUmber()).isPresent()){
             throw new CustomerAlreadyExistException("Customer already exist with mobile number " + customerDto.getMobileNUmber());

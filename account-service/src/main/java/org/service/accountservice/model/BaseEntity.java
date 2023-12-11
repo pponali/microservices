@@ -29,11 +29,6 @@ import java.time.LocalDateTime;
 @EntityListeners(AuditingEntityListener.class)
 public class BaseEntity {
 
-    @GeneratedValue(strategy = GenerationType.AUTO, generator = "native")
-    @GenericGenerator(name = "native", parameters = @org.hibernate.annotations.Parameter(name = "sequence", value = "SEQ_ID"))
-    @Column(updatable = false, nullable = false, unique = true, length = 10, columnDefinition = "bigint")
-    @Id
-    Long id;
 
     @CreatedBy
     @Column(updatable = false)
