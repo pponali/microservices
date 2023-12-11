@@ -127,13 +127,13 @@
 		</plugins>
 	</build>
 	<modules>
-		<module>integrations</module>
-		<module>authorization</module>
-		<module>common</module>
+		<module>integration-service</module>
+		<module>authorization-service</module>
+		<module>common-service</module>
 		<module>config-server</module>
-		<module>discovery</module>
-		<module>netflix</module>
-		<module>gateway</module>
+		<module>discovery-service</module>
+		<module>netflix-service</module>
+		<module>gateway-service</module>
 		<module>resource-server</module>
 		<module>product-service</module>
 		<module>order-service</module>
