@@ -3,7 +3,17 @@ spring:
     console:
       enabled: true
   datasource:
-    url: jdbc:h2:mem:test
+    url: jdbc:h2:mem:testdb
     username: sa
     password:
     driverClassName: org.h2.Driver
+  jpa:
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.H2Dialect
+        hbm2ddl:
+          auto: update
+    show-sql: true
+  sql:
+    init:
+      mode: always

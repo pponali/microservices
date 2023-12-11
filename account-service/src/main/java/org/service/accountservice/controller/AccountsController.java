@@ -30,7 +30,7 @@ import java.util.Optional;
 
 
 @Tag(name = "Accounts", description = "Accounts API")
-@CrossOrigin(origins = "*", allowedHeaders = "*", maxAge = 3600, allowCredentials = "true")
+@CrossOrigin(origins = "*", allowedHeaders = "*", maxAge = 3600, allowCredentials = "false")
 @Validated
 @RestController
 @RequestMapping(path = "/api/v1", produces = {MediaType.APPLICATION_JSON_VALUE}, headers = "Accept=application/json")

@@ -35,8 +35,8 @@ public class AccountsServiceImpl implements IAccountsService {
     @Override
     public void createAccount(CustomerDto customerDto) {
         Account newAccount = new Account();
-        int accountNumber = 1000000 + new Random(9000000).nextInt();
-        newAccount.setAccountNumber(Integer.toString(accountNumber));
+        Long accountNumber = (long)(1000000 + new Random(9000000).nextInt());
+        newAccount.setAccountNumber(accountNumber);
         newAccount.setAccountType(AccountsConstants.SAVINGS_ACCOUNT);
         Customer customer = CustomerMapper.INSTANCE.toEntity(customerDto);
         if(customersRepository.findByMobileNumber(customerDto.getMobileNUmber()).isPresent()){

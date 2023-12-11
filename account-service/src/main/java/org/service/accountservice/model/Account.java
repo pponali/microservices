@@ -19,23 +19,21 @@ import org.hibernate.annotations.GenericGenerator;
 public class Account extends BaseEntity{
 
 
-
-
     @GeneratedValue(strategy = GenerationType.AUTO, generator = "native")
     @GenericGenerator(name = "native", parameters = @org.hibernate.annotations.Parameter(name = "sequence", value = "SEQ_ID"))
-    @Column(updatable = false, nullable = false, unique = true, length = 10, columnDefinition = "bigint")
+    @Column(name="account_number", updatable = false, nullable = false, unique = true, length = 10, columnDefinition = "bigint")
     @Id
-    Long accountId;
+    Long accountNumber;
 
-    @Column(updatable = false, nullable = false, unique = true, length = 10, columnDefinition = "bigint")
-    @JoinColumn(name = "customerId", referencedColumnName = "customerId", nullable = false, updatable = false, unique = true, columnDefinition = "bigint")
-    @OneToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL, optional = false, orphanRemoval = true)
-    Customer customerId;
 
+    @Column(name="customer_id")
+    Long customerId;
+
+    @Column(name="branch_address")
     String branchAddress;
 
-    String accountNumber;
 
+    @Column(name="account_type")
     String accountType;
 
 

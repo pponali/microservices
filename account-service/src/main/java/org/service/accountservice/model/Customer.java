@@ -16,15 +16,15 @@ import org.hibernate.annotations.GenericGenerator;
 @Data
 public class Customer extends BaseEntity{
 
-    @GeneratedValue(strategy = GenerationType.AUTO, generator = "native")
-    @GenericGenerator(name = "native", parameters = @org.hibernate.annotations.Parameter(name = "sequence", value = "SEQ_ID"))
-    @Column(updatable = false, nullable = false, unique = true, length = 10, columnDefinition = "bigint")
     @Id
+    @GeneratedValue(strategy= GenerationType.AUTO,generator="native")
+    @GenericGenerator(name = "native",strategy = "native")
+    @Column(name="customer_id")
     Long customerId;
 
     String name;
 
     String email;
-
+    @Column(name="mobile_number")
     String mobileNumber;
 }
