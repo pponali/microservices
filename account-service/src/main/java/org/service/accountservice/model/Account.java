@@ -3,6 +3,7 @@ package org.service.accountservice.model;
 import jakarta.persistence.*;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
+import lombok.NoArgsConstructor;
 import org.hibernate.annotations.GenericGenerator;
 
 /**
@@ -14,6 +15,7 @@ import org.hibernate.annotations.GenericGenerator;
 @EqualsAndHashCode(callSuper = true)
 @Data
 @Entity
+@NoArgsConstructor
 public class Account extends BaseEntity{
 
 

@@ -18,7 +18,7 @@ import org.service.accountservice.model.BaseEntity;
  * @Description
  */
 
-@Data @AllArgsConstructor @NoArgsConstructor
+@Data @AllArgsConstructor
 @Schema(name = "Customer details", description = "Customer details")
 @EqualsAndHashCode(callSuper = false, of = {"customerId", "name", "email", "mobileNUmber", "accountsDto"})
 
