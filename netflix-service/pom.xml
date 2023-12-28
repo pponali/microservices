@@ -10,8 +10,8 @@
     </parent>
     <artifactId>netflix-service</artifactId>
     <version>0.0.1-SNAPSHOT</version>
-    <name>netflix</name>
-    <description>netflix</description>
+    <name>netflix-service</name>
+    <description>netflix-service</description>
     <properties>
         <java.version>17</java.version>
     </properties>

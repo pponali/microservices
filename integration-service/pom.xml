@@ -10,8 +10,8 @@
     </parent>
     <artifactId>integration-service</artifactId>
     <version>0.0.1-SNAPSHOT</version>
-    <name>integrations</name>
-    <description>integrations</description>
+    <name>integration-service</name>
+    <description>integration-service</description>
     <properties>
         <java.version>17</java.version>
     </properties>

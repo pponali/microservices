@@ -10,8 +10,8 @@
     </parent>
     <artifactId>common-service</artifactId>
     <version>0.0.1-SNAPSHOT</version>
-    <name>common</name>
-    <description>common</description>
+    <name>common-service</name>
+    <description>common-service</description>
     <properties>
         <java.version>17</java.version>
         <spring-cloud.version>2022.0.4</spring-cloud.version>

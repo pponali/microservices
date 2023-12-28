@@ -10,8 +10,8 @@
     </parent>
     <artifactId>resource-server</artifactId>
     <version>0.0.1-SNAPSHOT</version>
-    <name>resouceserver</name>
-    <description>resouceserver</description>
+    <name>resource-server</name>
+    <description>resource-server</description>
     <properties>
         <java.version>17</java.version>
     </properties>
