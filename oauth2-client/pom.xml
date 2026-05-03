@@ -13,7 +13,6 @@
     <name>oauth2-client</name>
     <description>oauth2-client</description>
     <properties>
-        <java.version>17</java.version>
     </properties>
     <dependencies>
         <dependency>

@@ -7,7 +7,7 @@ logging:
 
 spring:
   application:
-    name: springoauthclient
+    name: gateway-service
   security:
     oauth2:
       client:
@@ -36,7 +36,46 @@ spring:
         - TokenRelay=
         - SaveSession
       routes:
-        - id: route
+
+        # ------------------------------------------------------------------
+        # Public catalogue read traffic — generous limits.
+        # 50 req/sec average, 100 burst per IP.
+        # ------------------------------------------------------------------
+        - id: products-list
+          uri: lb://product-service
+          predicates:
+            - Path=/api/v1/products/**
+            - Method=GET
+          filters:
+            - name: RequestRateLimiter
+              args:
+                key-resolver: '#{@ipKeyResolver}'
+                redis-rate-limiter.replenishRate: 50
+                redis-rate-limiter.burstCapacity: 100
+                redis-rate-limiter.requestedTokens: 1
+
+        # ------------------------------------------------------------------
+        # Catalogue WRITE traffic — strict per-user limits.
+        # 5 req/sec, 10 burst per authenticated user.
+        # ------------------------------------------------------------------
+        - id: products-write
+          uri: lb://product-service
+          predicates:
+            - Path=/api/v1/products/**
+            - Method=POST,PUT,PATCH,DELETE
+          filters:
+            - name: RequestRateLimiter
+              args:
+                key-resolver: '#{@userKeyResolver}'
+                redis-rate-limiter.replenishRate: 5
+                redis-rate-limiter.burstCapacity: 10
+                redis-rate-limiter.requestedTokens: 1
+
+        # ------------------------------------------------------------------
+        # Existing protected resource route — kept as is, plus per-user rate
+        # limit so a single token can't hammer the resource server.
+        # ------------------------------------------------------------------
+        - id: protected-articles
           uri: http://localhost:8090
           predicates:
             - Path=/articles/protected
@@ -52,6 +91,12 @@ spring:
                 backoff:
                   firstBackoff: 10ms
                   maxBackoff: 500ms
+            - name: RequestRateLimiter
+              args:
+                key-resolver: '#{@userKeyResolver}'
+                redis-rate-limiter.replenishRate: 10
+                redis-rate-limiter.burstCapacity: 20
+
 resilience4j:
   circuitbreaker:
     instances:

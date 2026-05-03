@@ -1,0 +1,2 @@
+com.services.common.error.CommonErrorHandlingAutoConfiguration
+com.services.common.openapi.CommonOpenApiAutoConfiguration
