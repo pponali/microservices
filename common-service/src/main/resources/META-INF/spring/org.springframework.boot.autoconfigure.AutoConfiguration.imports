@@ -1,2 +1,3 @@
 com.services.common.error.CommonErrorHandlingAutoConfiguration
 com.services.common.openapi.CommonOpenApiAutoConfiguration
+com.services.common.idempotency.IdempotencyAutoConfiguration

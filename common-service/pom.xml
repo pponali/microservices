@@ -49,6 +49,13 @@
             <groupId>org.springframework.security</groupId>
             <artifactId>spring-security-core</artifactId>
         </dependency>
+        <!-- Optional Redis support: only the idempotency filter uses it, and only when
+             services that depend on common-service activate the @Idempotent path. -->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-data-redis</artifactId>
+            <optional>true</optional>
+        </dependency>
     </dependencies>
 
     <build>
