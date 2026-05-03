@@ -1,0 +1,54 @@
+# Stands up the full stack:
+#   - 1 Eureka discovery server
+#   - 2 user-service replicas (the load-balancing target)
+#   - 1 catalog-service (the client-side LB caller)
+#   - 1 api-gateway (the server-side LB front door)
+#
+# Both user-service replicas register under the SAME spring.application.name
+# but get unique IPs from Docker, which gives Eureka 2 instances to balance across.
+
+services:
+  discovery:
+    build: ./discovery-service
+    container_name: discovery
+    ports:
+      - "8761:8761"
+
+  user-service-1:
+    build: ./user-service
+    container_name: user-service-1
+    environment:
+      SERVER_PORT: 8081
+      EUREKA_URL: http://discovery:8761/eureka/
+    depends_on:
+      - discovery
+
+  user-service-2:
+    build: ./user-service
+    container_name: user-service-2
+    environment:
+      SERVER_PORT: 8081
+      EUREKA_URL: http://discovery:8761/eureka/
+    depends_on:
+      - discovery
+
+  catalog-service:
+    build: ./catalog-service
+    container_name: catalog-service
+    ports:
+      - "8082:8082"
+    environment:
+      SERVER_PORT: 8082
+      EUREKA_URL: http://discovery:8761/eureka/
+    depends_on:
+      - discovery
+
+  api-gateway:
+    build: ./apigateway
+    container_name: api-gateway
+    ports:
+      - "8080:8080"
+    environment:
+      EUREKA_URL: http://discovery:8761/eureka/
+    depends_on:
+      - discovery
