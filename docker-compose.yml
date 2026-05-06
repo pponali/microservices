@@ -9,7 +9,9 @@
 
 services:
   discovery:
-    build: ./discovery-service
+    build:
+      context: .
+      dockerfile: discovery-service/Dockerfile
     container_name: discovery
     ports:
       - "8761:8761"
