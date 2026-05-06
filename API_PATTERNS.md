@@ -1412,3 +1412,31 @@ External request
 ```
 
 Every concept on the list has a place in the request lifecycle. Reading the table above + this doc top-to-bottom, you should be able to point at any single line of incoming-request handling and say which concept governs it.
+
+---
+
+## Appendix: Resilience4j — the next learning step
+
+**Status.** Partially used today and worth expanding deliberately. [`order-service`](order-service/) already wires four Resilience4j primitives on its outbound call to inventory-service (see [§10 Throttling](#10-throttling)). The remaining feature — **Rate Limiter** — and a more disciplined per-downstream policy are out of scope for this project but are the natural next step.
+
+**The full Resilience4j toolbox:**
+
+| Feature | What it adds | Already in this repo? |
+|---|---|---|
+| **Circuit Breaker** | After N failures to a downstream, fail-fast for a cooldown window so callers don't keep racking up timeouts on a service that's clearly down. | Yes — `@CircuitBreaker(name="inventory")` on [`OrderController.placeOrder`](order-service/src/main/java/com/services/order/controller/OrderController.java) |
+| **Time Limiter** | Cap call duration; abort hung downstreams so a stuck socket doesn't tie up a thread forever. | Yes — `@TimeLimiter(name="inventory")` |
+| **Bulkhead** | Cap concurrent in-flight calls per downstream so one slow service can't starve all your worker threads (cascading failure prevention). | Yes — `@Bulkhead(name="inventory", maxConcurrentCalls=20)` |
+| **Retry with backoff** | Smarter retry policy than the load balancer's flat retry — exponential delay with jitter, configurable on which exceptions to retry. | Yes — `@Retry(name="inventory")`; current config is flat `wait-duration=5s`, no jitter |
+| **Rate Limiter** | Cap calls per second to a downstream you don't want to overwhelm (different from gateway-side rate limiting in §9 — this is *outbound* protection of a fragile dependency). | **No** — would be added as `@RateLimiter(name="...")` |
+
+**How the existing four already compose** (from §10): annotations evaluate outside-in, so Bulkhead rejects first → CircuitBreaker fail-fasts → TimeLimiter aborts a slow call → Retry kicks in on transient failures. Adding `@RateLimiter` would slot in as the outermost cap on call rate.
+
+**What "the next step" looks like concretely:**
+
+1. **Add `@RateLimiter`** to outbound calls that hit fragile or rate-limited third parties (e.g. webhook delivery in notification-service, where customer endpoints may have their own quotas).
+2. **Improve retry policy** — switch from flat `wait-duration` to `IntervalFunction.ofExponentialRandomBackoff(...)` so retries don't synchronise across replicas.
+3. **Per-downstream policies** — today `inventory` is the only configured instance; as more services are introduced, each gets its own tuning.
+4. **Wire metrics** — Resilience4j ships Micrometer integration. Expose circuit-breaker state and bulkhead saturation to Prometheus/Grafana so you can see *why* a request was rejected.
+5. **Consider gateway-side equivalents** — Spring Cloud Gateway's `CircuitBreaker` filter (already used on the `protected-articles` route, see §18) is the gateway-level analog; decide which concerns live at the edge vs at each service.
+
+**Reference:** https://resilience4j.readme.io/docs
