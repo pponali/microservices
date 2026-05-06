@@ -1,0 +1,16 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Home</title>
+</head>
+<body>
+<h1>Welcome</h1>
+<div th:if="${#authentication.principal}">
+    <h2 th:text="${#authentication.principal.attributes.name}">Username</h2>
+    <a href="/logout">Logout</a>
+</div>
+<div th:unless="${#authentication.principal}">
+    <a href="/oauth2/authorization/github">Login with GitHub</a>
+</div>
+</body>
+</html>

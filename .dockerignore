@@ -1,0 +1,28 @@
+# Keep the build context small so each `docker build` is fast.
+# Each per-module Dockerfile is built FROM the repo root (because they
+# share the parent pom + common-service), so this file applies globally.
+
+target/
+**/target/
+.git/
+.idea/
+.vscode/
+*.iml
+.DS_Store
+**/.DS_Store
+.claude/
+*.log
+*.jar
+*.war
+*.tar.gz
+node_modules/
+
+# Don't ship Dockerfiles into the build context unnecessarily.
+# (They're not needed at build time, and excluding them avoids invalidation.)
+**/Dockerfile
+
+# Local configs that should never end up in an image.
+.env
+.env.*
+**/.env
+**/.env.*

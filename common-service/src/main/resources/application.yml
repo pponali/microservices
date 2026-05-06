@@ -1,0 +1,10 @@
+server:
+  port: 4444
+
+spring:
+  ai:
+    openai:
+      apikey: "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"
+      baseUrl: "https://api.openai.com"
+      model: "gpt-4"
+      temperature: 0.7

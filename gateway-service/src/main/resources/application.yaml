@@ -1,0 +1,111 @@
+server:
+  port: 3333
+
+logging:
+  level:
+    org.springframework.cloud.gateway: TRACE
+
+spring:
+  application:
+    name: gateway-service
+  security:
+    oauth2:
+      client:
+        registration:
+          gateway:
+            provider: spring
+            client-id: api-client
+            client-secret: secret
+            scope: read,openid
+            authorization-grant-type: authorization_code
+            redirect-uri: http://localhost:3333/login/oauth2/code/spring
+        provider:
+          spring:
+            issuer-uri: http://auth-server:8080
+  session:
+    store-type: redis
+  data:
+    redis:
+      host: localhost
+      port: 6379
+      password: password
+      username:
+  cloud:
+    gateway:
+      default-filters:
+        - TokenRelay=
+        - SaveSession
+      routes:
+
+        # ------------------------------------------------------------------
+        # Public catalogue read traffic — generous limits.
+        # 50 req/sec average, 100 burst per IP.
+        # ------------------------------------------------------------------
+        - id: products-list
+          uri: lb://product-service
+          predicates:
+            - Path=/api/v1/products/**
+            - Method=GET
+          filters:
+            - name: RequestRateLimiter
+              args:
+                key-resolver: '#{@ipKeyResolver}'
+                redis-rate-limiter.replenishRate: 50
+                redis-rate-limiter.burstCapacity: 100
+                redis-rate-limiter.requestedTokens: 1
+
+        # ------------------------------------------------------------------
+        # Catalogue WRITE traffic — strict per-user limits.
+        # 5 req/sec, 10 burst per authenticated user.
+        # ------------------------------------------------------------------
+        - id: products-write
+          uri: lb://product-service
+          predicates:
+            - Path=/api/v1/products/**
+            - Method=POST,PUT,PATCH,DELETE
+          filters:
+            - name: RequestRateLimiter
+              args:
+                key-resolver: '#{@userKeyResolver}'
+                redis-rate-limiter.replenishRate: 5
+                redis-rate-limiter.burstCapacity: 10
+                redis-rate-limiter.requestedTokens: 1
+
+        # ------------------------------------------------------------------
+        # Existing protected resource route — kept as is, plus per-user rate
+        # limit so a single token can't hammer the resource server.
+        # ------------------------------------------------------------------
+        - id: protected-articles
+          uri: http://localhost:8090
+          predicates:
+            - Path=/articles/protected
+          filters:
+            - name: CircuitBreaker
+              args:
+                name: resourceServer
+                fallbackUri: forward:/fallback
+            - name: Retry
+              args:
+                retries: 30
+                methods: GET
+                backoff:
+                  firstBackoff: 10ms
+                  maxBackoff: 500ms
+            - name: RequestRateLimiter
+              args:
+                key-resolver: '#{@userKeyResolver}'
+                redis-rate-limiter.replenishRate: 10
+                redis-rate-limiter.burstCapacity: 20
+
+resilience4j:
+  circuitbreaker:
+    instances:
+      resourceServer:
+        slidingWindowSize: 10
+        permittedNumberOfCallsInHalfOpenState: 5
+        failureRateThreshold: 50
+        waitDurationInOpenState: 10000
+  timelimiter:
+    configs:
+      resourceServer:
+        timeoutDuration: 20s
