@@ -32,6 +32,30 @@
 
     <dependencyManagement>
         <dependencies>
+            <!-- Tomcat 10.1.54: Fixes all known CVEs (10.1.52-10.1.53 had 7 total CVEs) -->
+            <dependency>
+                <groupId>org.apache.tomcat.embed</groupId>
+                <artifactId>tomcat-embed-core</artifactId>
+                <version>10.1.54</version>
+            </dependency>
+            <dependency>
+                <groupId>org.apache.tomcat.embed</groupId>
+                <artifactId>tomcat-embed-el</artifactId>
+                <version>10.1.54</version>
+            </dependency>
+            <dependency>
+                <groupId>org.apache.tomcat.embed</groupId>
+                <artifactId>tomcat-embed-websocket</artifactId>
+                <version>10.1.54</version>
+            </dependency>
+            
+            <!-- BouncyCastle 1.84: Fixes MEDIUM/HIGH CVEs in 1.80 (CVE-2026-0636, CVE-2026-5598) -->
+            <dependency>
+                <groupId>org.bouncycastle</groupId>
+                <artifactId>bcprov-jdk18on</artifactId>
+                <version>1.84</version>
+            </dependency>
+            
             <dependency>
                 <groupId>org.springframework.cloud</groupId>
                 <artifactId>spring-cloud-dependencies</artifactId>
