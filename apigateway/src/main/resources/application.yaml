@@ -1,0 +1,49 @@
+server:
+  port: 8080
+
+spring:
+  application:
+    # No spaces — Eureka uses this as the service id and lb:// uri host.
+    name: api-gateway
+  cloud:
+    gateway:
+      discovery:
+        locator:
+          # We define explicit routes below for clarity.
+          # Set this to true if you want every Eureka service auto-exposed at /<service-id>/**.
+          enabled: false
+          lower-case-service-id: true
+      routes:
+        - id: user-service
+          # lb://<service-name> — gateway looks up "user-service" in Eureka
+          # and the LoadBalancer picks an instance per request.
+          # This is server-side load balancing from the external client's POV.
+          uri: lb://user-service
+          predicates:
+            - Path=/api/users/**
+          filters:
+            - StripPrefix=1
+        - id: catalog-service
+          uri: lb://catalog-service
+          predicates:
+            - Path=/api/catalog/**
+          filters:
+            # remove the first segment of the path /api/catalog/** => /catalog/**
+            - StripPrefix=1
+
+eureka:
+  client:
+    service-url:
+      defaultZone: ${EUREKA_URL:http://localhost:8761/eureka/}
+  instance:
+    prefer-ip-address: true
+    instance-id: ${spring.application.name}:${random.value}
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info,gateway
+  endpoint:
+    health:
+      show-details: always
