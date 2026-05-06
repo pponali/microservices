@@ -16,10 +16,10 @@
 
     <properties>
         <!--
-            Source/target Java 21. We DO use Java 25's javac (latest, installed),
-            but emit Java 21 bytecode because Lombok 1.18.38's bundled ASM library
-            does not yet recognise class file major version 69 (Java 25 final).
-            Drop to 21 for now; revisit when Lombok 1.18.40+ ships with ASM 9.8.
+            Compile with Java 25 javac but emit Java 21 bytecode.
+            Lombok 1.18.38's ASM library does not yet support Java 25 bytecode (major version 69).
+            This allows use of Java 25 language features/compiler while maintaining bytecode compatibility.
+            TODO: Upgrade to Lombok with Java 25 ASM support when available.
         -->
         <java.version>21</java.version>
         <maven.compiler.release>21</maven.compiler.release>
