@@ -2,14 +2,12 @@ package com.services.notification.webhook;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import io.github.resilience4j.ratelimiter.RequestNotPermitted;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.http.HttpHeaders;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.HttpStatusCode;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
-import org.springframework.web.client.RestClient;
 import org.springframework.web.client.RestClientResponseException;
 
 import java.time.Instant;
@@ -42,6 +40,7 @@ public class WebhookDeliveryService {
 
     private final WebhookSubscriptionRepository subscriptions;
     private final ObjectMapper objectMapper;
+    private final WebhookHttpClient httpClient;
 
     /**
      * Fire all matching subscriptions for the given event type.
@@ -100,23 +99,19 @@ public class WebhookDeliveryService {
         String signature = WebhookSigner.sign(body, sub.getSecret(), ts);
 
         try {
-            HttpStatusCode status = RestClient.create()
-                    .post()
-                    .uri(sub.getCallbackUrl())
-                    .header(HttpHeaders.CONTENT_TYPE, "application/json")
-                    .header("X-Webhook-Signature", signature)
-                    .header("X-Webhook-Event", sub.getEventType())
-                    .header("X-Webhook-Attempt", String.valueOf(attempt))
-                    .body(body)
-                    .retrieve()
-                    .toBodilessEntity()
-                    .getStatusCode();
+            HttpStatusCode status = httpClient.post(
+                    sub.getCallbackUrl(), body, signature, sub.getEventType(), attempt);
 
             if (status.is2xxSuccessful()) {
                 log.info("Webhook delivered to {} on attempt {} ({})", sub.getCallbackUrl(), attempt, status.value());
                 return true;
             }
             log.warn("Webhook to {} returned {} on attempt {}", sub.getCallbackUrl(), status.value(), attempt);
+            return false;
+        } catch (RequestNotPermitted e) {
+            // Outbound rate limit hit — treat as transient so the next backoff tick retries.
+            log.warn("Webhook to {} attempt {} rate-limited by webhook-delivery limiter; will retry",
+                    sub.getCallbackUrl(), attempt);
             return false;
         } catch (RestClientResponseException e) {
             HttpStatusCode statusCode = e.getStatusCode();
