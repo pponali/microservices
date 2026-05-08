@@ -179,6 +179,10 @@
         <module>order-service</module>
         <module>notification-service</module>
         <module>inventory-service</module>
+        <module>apigateway</module>
+        <module>user-service</module>
+        <module>catalog-service</module>
+        <module>oauth2-client</module>
     </modules>
 
     <packaging>pom</packaging>
