@@ -11,11 +11,14 @@ metadata:
     app.kubernetes.io/name: {{ $name }}
     tier: {{ $svc.tier | default "app" }}
 spec:
-  type: ClusterIP
+  type: {{ if $svc.nodePort }}NodePort{{ else }}ClusterIP{{ end }}
   ports:
     - port: {{ $svc.port }}
       targetPort: {{ $svc.port }}
       name: http
+      {{- if $svc.nodePort }}
+      nodePort: {{ $svc.nodePort }}
+      {{- end }}
   selector:
     app.kubernetes.io/name: {{ $name }}
 ---

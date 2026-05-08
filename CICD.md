@@ -53,6 +53,17 @@ sudo netfilter-persistent save   # Ubuntu 24.04
 
 `apps.khetisahayak.com` A → `80.225.224.96` (already done — verified via `dig`).
 
+### 4. nginx vhost on the VM (one-time)
+
+The VM's host nginx is the edge for several existing sites (job, monitoring, n8n …) and owns ports 80/443. The Helm chart therefore does NOT install an in-cluster Ingress or cert-manager. Instead, the api-gateway is exposed as a NodePort on `30080`, and host nginx reverse-proxies to it with TLS via Certbot.
+
+```
+ssh ubuntu@80.225.224.96
+sudo bash ~/microservices/scripts/setup-nginx-vhost.sh
+```
+
+The script is idempotent — it creates `/etc/nginx/sites-enabled/apps.khetisahayak.com`, runs `certbot --nginx -d apps.khetisahayak.com`, and reloads nginx. Run it AFTER the first successful CD deploy (so NodePort 30080 actually exists), or before — the vhost just returns 502 until the gateway pod is up, but Certbot's HTTP-01 challenge still works.
+
 ## How a deploy unfolds
 
 1. `git push` to `master`.

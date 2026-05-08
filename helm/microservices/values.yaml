@@ -75,7 +75,9 @@ services:
     enabled: true
     tier: edge
     port: 8080
-    ingress: true
+    # Exposed via host nginx (which fronts apps.khetisahayak.com) → NodePort 30080.
+    # nginx terminates TLS via existing Certbot. No in-cluster Ingress.
+    nodePort: 30080
     env:
       EUREKA_CLIENT_SERVICEURL_DEFAULTZONE: http://discovery-service:8761/eureka/
 
@@ -164,8 +166,10 @@ services:
     tier: app
     port: 8080
 
+# Host nginx + Certbot is the edge for apps.khetisahayak.com — no in-cluster Ingress.
+# (Set enabled: true only if you migrate edge into k3s Traefik later.)
 ingress:
-  enabled: true
+  enabled: false
   className: traefik
   clusterIssuer: letsencrypt-prod
 
