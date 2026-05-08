@@ -48,8 +48,10 @@ spec:
           ports:
             - containerPort: {{ $svc.port }}
           env:
+{{- if not (hasKey ($svc.env | default dict) "SPRING_PROFILES_ACTIVE") }}
             - name: SPRING_PROFILES_ACTIVE
               value: {{ $svc.profile | default "k8s" }}
+{{- end }}
 {{- range $k, $v := $svc.env }}
             - name: {{ $k }}
               value: {{ $v | quote }}

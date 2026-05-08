@@ -158,7 +158,10 @@ jobs:
 
   deploy:
     needs: [detect-changes, build-push]
-    if: needs.detect-changes.outputs.any == 'true'
+    if: |
+      always() &&
+      needs.build-push.result != 'failure' &&
+      (needs.detect-changes.outputs.any == 'true' || needs.detect-changes.outputs.chart_changed == 'true')
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
