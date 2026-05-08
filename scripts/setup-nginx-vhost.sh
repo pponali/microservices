@@ -14,6 +14,8 @@ if [[ $EUID -ne 0 ]]; then
 fi
 
 # 1. Plain HTTP vhost (Certbot needs port 80 reachable for the ACME challenge).
+mkdir -p /var/www/letsencrypt/.well-known/acme-challenge
+
 cat > "/etc/nginx/sites-available/$DOMAIN" <<EOF
 server {
     listen 80;
@@ -21,6 +23,13 @@ server {
 
     # Large request bodies for file uploads through the gateway
     client_max_body_size 50m;
+
+    # ACME challenge served from disk (Certbot writes here during issuance/renewal).
+    location ^~ /.well-known/acme-challenge/ {
+        root /var/www/letsencrypt;
+        default_type "text/plain";
+        try_files \$uri =404;
+    }
 
     location / {
         proxy_pass         http://127.0.0.1:$NODEPORT;
