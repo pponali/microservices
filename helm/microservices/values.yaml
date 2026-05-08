@@ -155,11 +155,11 @@ services:
       EUREKA_CLIENT_SERVICEURL_DEFAULTZONE: http://discovery-service:8761/eureka/
 
   common-service:
-    enabled: true
+    # Library JAR (spring-boot-maven-plugin <skip>true</skip>); not runnable.
+    # Used as a Maven dependency by other services.
+    enabled: false
     tier: app
     port: 4444
-    env:
-      EUREKA_CLIENT_SERVICEURL_DEFAULTZONE: http://discovery-service:8761/eureka/
 
   netflix-service:
     enabled: false
