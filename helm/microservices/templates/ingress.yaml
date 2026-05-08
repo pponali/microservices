@@ -1,0 +1,36 @@
+{{- if .Values.ingress.enabled }}
+{{- $gateway := "" -}}
+{{- $gatewayPort := 80 -}}
+{{- range $name, $svc := .Values.services -}}
+{{- if and $svc.enabled $svc.ingress -}}
+{{- $gateway = $name -}}
+{{- $gatewayPort = $svc.port -}}
+{{- end -}}
+{{- end }}
+{{- if $gateway }}
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: microservices
+  namespace: {{ .Values.namespace }}
+  annotations:
+    cert-manager.io/cluster-issuer: {{ .Values.ingress.clusterIssuer }}
+spec:
+  ingressClassName: {{ .Values.ingress.className }}
+  tls:
+    - hosts:
+        - {{ .Values.global.domain }}
+      secretName: {{ .Values.global.domain | replace "." "-" }}-tls
+  rules:
+    - host: {{ .Values.global.domain }}
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: {{ $gateway }}
+                port:
+                  number: {{ $gatewayPort }}
+{{- end }}
+{{- end }}

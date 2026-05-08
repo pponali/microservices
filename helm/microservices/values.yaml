@@ -1,0 +1,179 @@
+global:
+  domain: apps.khetisahayak.com
+  letsEncryptEmail: subscribeclaude@gmail.com
+  image:
+    registry: docker.io
+    repository: pponali
+    tag: latest
+    pullPolicy: Always
+
+namespace: microservices
+
+infra:
+  mysql:
+    enabled: true
+    image: mysql:8.0
+    rootPassword: rootpw
+    database: sptools_storage
+    user: sptools
+    password: sptools
+    storage: 5Gi
+  mongodb:
+    enabled: true
+    image: mongo:7.0
+    storage: 5Gi
+  redis:
+    enabled: true
+    image: redis:7-alpine
+  kafka:
+    enabled: true
+    image: bitnami/kafka:3.7
+    storage: 2Gi
+
+# All Spring Boot services. Same template renders Deployment + Service for each.
+# Set enabled:false to skip.
+services:
+  config-server:
+    enabled: true
+    tier: platform
+    port: 8080
+    replicas: 1
+    env:
+      SPRING_PROFILES_ACTIVE: native
+
+  discovery-service:
+    enabled: true
+    tier: platform
+    port: 8761
+    replicas: 1
+
+  authorization-service:
+    enabled: true
+    tier: security
+    port: 9000
+    env:
+      SPRING_DATASOURCE_URL: jdbc:mysql://mysql:3306/sptools_storage
+      SPRING_DATASOURCE_USERNAME: sptools
+      SPRING_DATASOURCE_PASSWORD: sptools
+      EUREKA_CLIENT_SERVICEURL_DEFAULTZONE: http://discovery-service:8761/eureka/
+
+  resource-server:
+    enabled: true
+    tier: security
+    port: 8090
+    env:
+      EUREKA_CLIENT_SERVICEURL_DEFAULTZONE: http://discovery-service:8761/eureka/
+
+  oauth2-client:
+    enabled: true
+    tier: security
+    port: 5555
+    env:
+      EUREKA_CLIENT_SERVICEURL_DEFAULTZONE: http://discovery-service:8761/eureka/
+
+  apigateway:
+    enabled: true
+    tier: edge
+    port: 8080
+    ingress: true
+    env:
+      EUREKA_CLIENT_SERVICEURL_DEFAULTZONE: http://discovery-service:8761/eureka/
+
+  gateway-service:
+    enabled: false   # alternative to apigateway; off by default
+    tier: edge
+    port: 3333
+
+  user-service:
+    enabled: true
+    tier: app
+    port: 8081
+    replicas: 2
+    env:
+      SERVER_PORT: "8081"
+      EUREKA_CLIENT_SERVICEURL_DEFAULTZONE: http://discovery-service:8761/eureka/
+
+  catalog-service:
+    enabled: true
+    tier: app
+    port: 8082
+    env:
+      SERVER_PORT: "8082"
+      EUREKA_CLIENT_SERVICEURL_DEFAULTZONE: http://discovery-service:8761/eureka/
+
+  product-service:
+    enabled: true
+    tier: app
+    port: 8080
+    env:
+      SERVER_PORT: "8080"
+      SPRING_DATA_MONGODB_URI: mongodb://mongodb:27017/product-service
+      REDIS_HOST: redis
+      EUREKA_CLIENT_SERVICEURL_DEFAULTZONE: http://discovery-service:8761/eureka/
+
+  inventory-service:
+    enabled: true
+    tier: app
+    port: 8080
+    env:
+      SERVER_PORT: "8080"
+      SPRING_DATASOURCE_URL: jdbc:mysql://mysql:3306/sptools_storage
+      SPRING_DATASOURCE_USERNAME: sptools
+      SPRING_DATASOURCE_PASSWORD: sptools
+      EUREKA_CLIENT_SERVICEURL_DEFAULTZONE: http://discovery-service:8761/eureka/
+
+  order-service:
+    enabled: true
+    tier: app
+    port: 8081
+    env:
+      SERVER_PORT: "8081"
+      SPRING_DATASOURCE_URL: jdbc:mysql://mysql:3306/sptools_storage
+      SPRING_DATASOURCE_USERNAME: sptools
+      SPRING_DATASOURCE_PASSWORD: sptools
+      REDIS_HOST: redis
+      SPRING_KAFKA_BOOTSTRAP_SERVERS: kafka:9092
+      EUREKA_CLIENT_SERVICEURL_DEFAULTZONE: http://discovery-service:8761/eureka/
+
+  notification-service:
+    enabled: true
+    tier: app
+    port: 8080
+    env:
+      SERVER_PORT: "8080"
+      SPRING_KAFKA_BOOTSTRAP_SERVERS: kafka:9092
+      EUREKA_CLIENT_SERVICEURL_DEFAULTZONE: http://discovery-service:8761/eureka/
+
+  integration-service:
+    enabled: true
+    tier: app
+    port: 8080
+    env:
+      SERVER_PORT: "8080"
+      EUREKA_CLIENT_SERVICEURL_DEFAULTZONE: http://discovery-service:8761/eureka/
+
+  common-service:
+    enabled: true
+    tier: app
+    port: 4444
+    env:
+      EUREKA_CLIENT_SERVICEURL_DEFAULTZONE: http://discovery-service:8761/eureka/
+
+  netflix-service:
+    enabled: false
+    tier: app
+    port: 8080
+
+ingress:
+  enabled: true
+  className: traefik
+  clusterIssuer: letsencrypt-prod
+
+resources:
+  default:
+    requests:
+      cpu: 50m
+      memory: 256Mi
+    limits:
+      cpu: "1"
+      memory: 768Mi
