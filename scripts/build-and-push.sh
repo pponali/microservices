@@ -37,7 +37,7 @@ build_one() {
     return 0
   fi
   echo ">>> [$svc] building $REPO/$svc:$TAG"
-  docker build -t "$REPO/$svc:$TAG" "$svc"
+  docker build -t "$REPO/$svc:$TAG" -f "$svc/Dockerfile" .
   echo ">>> [$svc] pushing"
   docker push "$REPO/$svc:$TAG"
 }

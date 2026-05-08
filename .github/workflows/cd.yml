@@ -144,7 +144,10 @@ jobs:
         if: steps.check.outputs.skip != 'true'
         uses: docker/build-push-action@v5
         with:
-          context: ./${{ matrix.service }}
+          # Repo root is the build context — most Dockerfiles use `mvn -pl <svc> -am`
+          # which needs the parent pom.xml (sibling of each module).
+          context: .
+          file: ./${{ matrix.service }}/Dockerfile
           platforms: linux/arm64
           push: true
           tags: |
