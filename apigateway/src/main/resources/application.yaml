@@ -30,6 +30,36 @@ spring:
           filters:
             # remove the first segment of the path /api/catalog/** => /catalog/**
             - StripPrefix=1
+        # ---- Aggregated Swagger pass-through routes ----
+        # Each downstream service exposes /v3/api-docs locally; the gateway re-exposes
+        # them on distinct paths so a single Swagger UI on the gateway can list them all.
+        - id: user-service-docs
+          uri: lb://user-service
+          predicates:
+            - Path=/v3/api-docs/users
+          filters:
+            - SetPath=/v3/api-docs
+        - id: catalog-service-docs
+          uri: lb://catalog-service
+          predicates:
+            - Path=/v3/api-docs/catalog
+          filters:
+            - SetPath=/v3/api-docs
+
+# Aggregated Swagger UI: served from the gateway at /swagger-ui.html with a
+# dropdown that switches between each service's OpenAPI doc (fetched via the
+# pass-through routes above).
+springdoc:
+  api-docs:
+    enabled: true
+  swagger-ui:
+    enabled: true
+    path: /swagger-ui.html
+    urls:
+      - name: user-service
+        url: /v3/api-docs/users
+      - name: catalog-service
+        url: /v3/api-docs/catalog
 
 eureka:
   client:
