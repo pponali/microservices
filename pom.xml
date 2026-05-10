@@ -183,6 +183,7 @@
         <module>user-service</module>
         <module>catalog-service</module>
         <module>oauth2-client</module>
+        <module>concurrency-demo</module>
     </modules>
 
     <packaging>pom</packaging>

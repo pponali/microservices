@@ -45,6 +45,18 @@ spring:
             - Path=/v3/api-docs/catalog
           filters:
             - SetPath=/v3/api-docs
+        - id: config-service-docs
+          uri: lb://config-service
+          predicates:
+            - Path=/v3/api-docs/config
+          filters:
+            - SetPath=/v3/api-docs
+        - id: eureka-service
+          uri: lb://eureka-service
+          predicates:
+            - Path=/eureka/**
+          filters:
+            - StripPrefix=1
 
 # Aggregated Swagger UI: served from the gateway at /swagger-ui.html with a
 # dropdown that switches between each service's OpenAPI doc (fetched via the
@@ -60,6 +72,11 @@ springdoc:
         url: /v3/api-docs/users
       - name: catalog-service
         url: /v3/api-docs/catalog
+      - name: config-service
+        url: /v3/api-docs/config
+      - name: eureka-service
+        url: /eureka/v2/api-docs
+
 
 eureka:
   client:

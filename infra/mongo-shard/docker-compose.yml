@@ -1,0 +1,74 @@
+# Local sharded MongoDB cluster (dev-grade — single-node replica sets).
+#
+#   ┌─────────┐
+#   │ mongos  │  :27020  ← clients connect here
+#   └────┬────┘
+#        │
+#   ┌────▼────────┐  ┌──────────┐  ┌──────────┐
+#   │  cfg (csrs) │  │ shard1rs │  │ shard2rs │
+#   │   :27019    │  │  :27018  │  │  :27028  │
+#   └─────────────┘  └──────────┘  └──────────┘
+#
+# Bring up:    docker-compose -f infra/mongo-shard/docker-compose.yml up -d
+# Tear down:   docker-compose -f infra/mongo-shard/docker-compose.yml down -v
+# Connect:     mongosh "mongodb://localhost:27020"
+#
+# After 'up', the 'mongo-init' container runs rs.initiate() on each replica
+# set, then sh.addShard() against the mongos. It exits 0 once done.
+
+services:
+  cfg:
+    image: mongo:7.0
+    container_name: mongo-cfg
+    command: ["mongod", "--configsvr", "--replSet", "cfgrs", "--port", "27019", "--bind_ip_all"]
+    ports:
+      - "27019:27019"
+    volumes:
+      - cfg-data:/data/db
+
+  shard1:
+    image: mongo:7.0
+    container_name: mongo-shard1
+    command: ["mongod", "--shardsvr", "--replSet", "shard1rs", "--port", "27018", "--bind_ip_all"]
+    ports:
+      - "27018:27018"
+    volumes:
+      - shard1-data:/data/db
+
+  shard2:
+    image: mongo:7.0
+    container_name: mongo-shard2
+    command: ["mongod", "--shardsvr", "--replSet", "shard2rs", "--port", "27028", "--bind_ip_all"]
+    ports:
+      - "27028:27028"
+    volumes:
+      - shard2-data:/data/db
+
+  mongos:
+    image: mongo:7.0
+    container_name: mongo-mongos
+    command: ["mongos", "--configdb", "cfgrs/cfg:27019", "--port", "27020", "--bind_ip_all"]
+    ports:
+      - "27020:27020"
+    depends_on:
+      - cfg
+      - shard1
+      - shard2
+
+  mongo-init:
+    image: mongo:7.0
+    container_name: mongo-init
+    depends_on:
+      - cfg
+      - shard1
+      - shard2
+      - mongos
+    volumes:
+      - ./init.sh:/init.sh:ro
+    entrypoint: ["bash", "/init.sh"]
+    restart: "no"
+
+volumes:
+  cfg-data:
+  shard1-data:
+  shard2-data:
